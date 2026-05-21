@@ -141,3 +141,18 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Claude Code local config / installed skills (skills-lock.json is the source
+# of truth and is committed)
+.claude/
+.agents/
+
+# Playwright MCP screenshots / debug artifacts
+.playwright-mcp/
+
+# Local tmp files
+*.tmp.*
+
+# Stray screenshots at repo root
+/nna-top.png
+/hero-fixed.png

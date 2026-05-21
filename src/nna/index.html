@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neural Network Algorithm — Lore</title>
+    <link rel="stylesheet" href="/styles/base.css" />
+  </head>
+  <body class="article">
+    <!-- ============ TITLE ============ -->
+    <header class="title">
+      <a class="back" href="/index.html">← Lore</a>
+      <p class="eyebrow">01 · Metaheuristic optimization</p>
+      <h1>The Neural Network Algorithm</h1>
+      <p class="subtitle">
+        A neural network that doesn't <em>learn</em> a task — it <em>becomes</em>
+        the optimizer. Watch a population of guesses flow through a weight
+        matrix toward the best answer they can find.
+      </p>
+      <p class="byline">Sadollah, Sayyaadi & Yadav · Applied Soft Computing, 2018</p>
+    </header>
+
+    <!-- ============ FIGURE 1: hero NN diagram ============ -->
+    <p class="figure-eyebrow">figure 1 · the shape</p>
+    <h2 class="figure-title">The algorithm <em>is</em> a neural network</h2>
+    <div class="figure-bleed">
+      <div class="stage tall">
+        <svg id="fig-hero"></svg>
+      </div>
+      <p class="figure-caption">
+        Eight parent candidates on the left. A weight matrix in the middle — drawn
+        as edges, each one's thickness the magnitude of a weight. Eight child
+        candidates on the right. Signals flow continuously along the edges; this
+        is what one iteration of the algorithm <em>looks like</em>. There is no
+        loss function and no labels — the network's only job is to mix the
+        parents into the next generation.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        Most uses of a neural network treat it as a function approximator. You
+        feed it inputs, it produces outputs, and you train its weights so the
+        outputs match labels. The <strong>Neural Network Algorithm</strong> —
+        NNA — takes the same shape and uses it for something else entirely.
+        Here, the weights and biases <em>are</em> the optimizer. Their job is
+        not to model your data; it is to shuffle a population of guesses
+        toward a good solution to whatever black-box problem you hand it.
+      </p>
+      <p>
+        Three pieces do all the work. The <strong>weight matrix</strong> mixes
+        old candidates into new ones. The <strong>bias operator</strong>
+        sprinkles randomness so the search keeps exploring. The
+        <strong>transfer operator</strong> tugs candidates toward the best
+        answer found so far. We'll meet each one as its own toy, then run them
+        all together — but first, a primer on what NNA is borrowing from.
+      </p>
+
+      <h2>A primer on neural networks</h2>
+      <p>
+        A neural network is a directed graph of tiny identical computations
+        called <strong>neurons</strong>. Each neuron does the same three things:
+        it takes a list of inputs <span class="math">x₁, x₂, …, xₙ</span>,
+        weights each one by a learned coefficient <span class="math">wᵢ</span>,
+        sums those weighted inputs together with a learnable
+        <strong>bias</strong> <span class="math">b</span>, and feeds the result
+        through a nonlinear <strong>activation function</strong>
+        <span class="math">σ</span>. One scalar comes out.
+      </p>
+
+      <div class="inline-formula">
+        <span class="math">z = Σᵢ wᵢ · xᵢ + b</span>
+        <span class="math">y = σ(z)</span>
+      </div>
+
+      <p>
+        Neurons are arranged in <strong>layers</strong>. The first layer reads
+        the raw input — pixels of an image, tokens of a sentence, a vector of
+        features. Each subsequent layer takes the previous layer's outputs as
+        its inputs. The connections between two adjacent layers are encoded in
+        a single <strong>weight matrix W</strong>: one entry per (input neuron,
+        output neuron) pair. Computing a whole layer's output is then just a
+        matrix-vector multiply followed by the activation:
+        <span class="math">x′ = σ(W·x + b)</span>. Stack a handful of those
+        and you have a <strong>feedforward network</strong>; information flows
+        in one direction, input to output, layer by layer.
+      </p>
+
+      <p>
+        The activation function is what makes a network more than a stack of
+        linear transforms. The classic choices: the <strong>sigmoid</strong>
+        <span class="math">σ(z) = 1 / (1 + e⁻ᶻ)</span>, a smooth S-curve that
+        squashes any input into (0, 1); the <strong>hyperbolic tangent</strong>
+        <span class="math">tanh(z)</span>, an S-curve into (-1, 1); and
+        <strong>ReLU</strong> <span class="math">max(0, z)</span> — by far the
+        most common today despite being embarrassingly simple. The math reason
+        a nonlinearity matters: composing two linear maps gives you another
+        linear map. Without σ between layers, a hundred-layer network
+        collapses into a single matrix and can only model lines and planes.
+        With σ in the middle, networks can in principle approximate any
+        continuous function — the so-called universal approximation theorem.
+      </p>
+
+      <p>
+        How does a network <em>learn</em>? You hand it training examples and
+        compute a <strong>loss</strong> — a number measuring how wrong the
+        network's output was. The gradient of that loss with respect to every
+        weight is computed by <strong>backpropagation</strong>: the chain rule,
+        applied layer by layer from output back to input. Each weight is then
+        nudged a small step in the direction that reduces the loss. This is
+        <strong>gradient descent</strong>. Iterate over millions of examples
+        and the network shapes itself to the task.
+      </p>
+
+      <p>
+        That whole machinery — the weighted sum, the activation, the
+        layer-by-layer matrix multiply, the gradient-driven learning — is the
+        backbone of nearly every model in modern AI: convolutional networks
+        for vision, recurrent networks for sequences, transformers for
+        language. They are all variations on this one shape, with different
+        wiring patterns and different ways of computing
+        <span class="math">W·x</span>.
+      </p>
+
+      <p>
+        And it is this shape, not the learning, that NNA borrows. Look back at
+        figure 1: input nodes, a weight matrix in the middle, output nodes on
+        the right. The picture is identical to a single layer of a feedforward
+        network. But the role is inverted. There is no loss, no backprop, no
+        labels. The "inputs" are not features of a data point — they are
+        candidate solutions to some optimization problem. The "outputs" are
+        the <em>next generation</em> of candidates. The weight matrix is not
+        learning to classify; it is learning <em>which mixing recipe</em>
+        produces better candidates. NNA takes the algebra of a feedforward
+        network and re-purposes it as a population-based optimizer.
+      </p>
+    </div>
+
+    <!-- ============ FIGURE 2: editable weight matrix ============ -->
+    <p class="figure-eyebrow">figure 2 · the weight matrix</p>
+    <h2 class="figure-title">Every row sums to one</h2>
+    <div class="figure-bleed">
+      <div class="stage">
+        <svg id="fig-matrix"></svg>
+      </div>
+      <p class="figure-caption">
+        The weight matrix <span class="math">W</span> couples the population to
+        itself: each new candidate is a <em>convex blend</em> of the old ones,
+        which is why every row has to sum to one. Click any cell — the cell
+        you bumped grows brighter, the others in its row dim to compensate, and
+        the row sum on the right snaps back to <span class="math">1.00</span>.
+        This is the network's only learnable parameter, and across iterations it
+        bends toward whatever mixing-recipe produced the best candidate.
+      </p>
+    </div>
+
+    <!-- ============ FIGURE 3: transfer tug-of-war ============ -->
+    <p class="figure-eyebrow">figure 3 · the transfer operator</p>
+    <h2 class="figure-title">A tug-of-war between target and current</h2>
+    <div class="figure-bleed">
+      <div class="stage">
+        <svg id="fig-tug"></svg>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="tug-w">pull toward target</label>
+          <input id="tug-w" type="range" min="0" max="1" step="0.01" value="0.5" />
+          <span class="value" id="tug-w-val">0.50</span>
+        </div>
+        <span class="spacer"></span>
+      </div>
+      <p class="figure-caption">
+        At every iteration each non-best candidate gets pulled part of the way
+        toward the best solution found so far. Drag the slider to set how hard
+        the rope pulls toward the target. Pull too hard and the swarm collapses
+        before it has explored; pull too gently and convergence stalls. NNA
+        starts gentle and tightens as iterations go by.
+      </p>
+    </div>
+
+    <!-- ============ FIGURE 4: bias as probability cloud ============ -->
+    <p class="figure-eyebrow">figure 4 · the bias operator</p>
+    <h2 class="figure-title">Bias: noise on purpose</h2>
+    <div class="figure-bleed">
+      <div class="stage tall">
+        <svg id="fig-bias"></svg>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="bias-spread">spread</label>
+          <input id="bias-spread" type="range" min="20" max="200" step="2" value="80" />
+          <span class="value" id="bias-spread-val">80</span>
+        </div>
+        <span class="spacer"></span>
+      </div>
+      <p class="figure-caption">
+        Drag the orange handle. The blue cloud around it is the bias
+        distribution — a Gaussian over the search space. Every iteration NNA
+        samples a tiny perturbation from this cloud and adds it to each
+        candidate's position, which is why you see the small dots flicker into
+        existence inside the halo. Early on the spread is wide and the swarm
+        wanders; over time the spread decays and exploration gives way to
+        exploitation.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h2>One step of the algorithm</h2>
+      <p>
+        Now the three pieces in a single iteration. Scroll slowly through the
+        next figure — the animation is bound to your scroll position. Edges
+        light up in order; child candidates emerge as their weighted blends
+        from the parents.
+      </p>
+    </div>
+
+    <!-- ============ FIGURE 5: single iteration (scrub-bound) ============ -->
+    <section class="figure-bleed" id="fig-single-section">
+      <p class="figure-eyebrow">figure 5 · one iteration · scroll-driven</p>
+      <h2 class="figure-title">Parents → mix → children</h2>
+      <div class="stage" style="aspect-ratio: 21/9;">
+        <svg id="fig-single"></svg>
+      </div>
+      <p class="figure-caption">
+        Each child position is <span class="math">x′ⱼ = Σᵢ Wⱼᵢ · xᵢ</span> — a
+        weighted sum of every parent. The bright edges contributed the most.
+      </p>
+    </section>
+
+    <div class="prose">
+      <p>
+        Repeat that step. Then repeat again, with the weight matrix re-tilted
+        toward what worked, the bias halo a little tighter, the transfer pull
+        a little stronger. Scroll through the next section and watch six
+        iterations play out in your hands.
+      </p>
+    </div>
+
+    <!-- ============ FIGURE 6: full convergence MARQUEE (scrub-bound) ============ -->
+    <section class="scrub-figure" id="fig-converge-section">
+      <p class="figure-eyebrow" style="margin-bottom: 0.5rem;">figure 6 · convergence · scroll-driven · interactive</p>
+      <h2 class="figure-title" style="margin-bottom: 1.25rem;">Six iterations</h2>
+      <!-- The pin holds stage + controls together so the controls bar
+           stays attached to the figure for the entire scrub. -->
+      <div class="scrub-pin">
+        <div class="scrub-stage" id="fig-converge-stage"></div>
+        <div class="scrub-controls">
+          <div class="controls">
+            <div class="ctrl">
+              <label for="cv-pop">population</label>
+              <input id="cv-pop" type="range" min="6" max="48" step="2" value="22" />
+              <span class="value" id="cv-pop-val">22</span>
+            </div>
+            <div class="ctrl">
+              <label for="cv-decay">bias decay</label>
+              <input id="cv-decay" type="range" min="0.6" max="0.97" step="0.01" value="0.82" />
+              <span class="value" id="cv-decay-val">0.82</span>
+            </div>
+            <span class="spacer"></span>
+            <button id="cv-rerun">re-run</button>
+          </div>
+        </div>
+      </div>
+      <div class="scrub-track"></div>
+      <div class="scrub-caption">
+        <p class="figure-caption">
+          Drag the orange dot to move the optimum anywhere on the landscape.
+          Slide the population up to crowd the search, or down to thin it.
+          Lower the bias decay to make the swarm stay exploratory longer. The
+          scroll-bar is the iteration clock — scroll back up to rewind.
+        </p>
+      </div>
+    </section>
+
+    <div class="prose">
+      <h2>Why bother?</h2>
+      <p>
+        Gradient descent is wonderful when you can take a derivative. Many real
+        problems — hyperparameter search, combinatorial design, simulation
+        tuning — give you only a black-box score. Metaheuristics exist for that
+        world. NNA's twist is that its update rule borrows the algebra of a
+        neural network rather than physics, biology, or thermodynamics. It's
+        worth comparing to its closest cousin.
+      </p>
+    </div>
+
+    <!-- ============ FIGURE 7: NNA vs GA ============ -->
+    <p class="figure-eyebrow">figure 7 · comparison</p>
+    <h2 class="figure-title">NNA vs. a Genetic Algorithm</h2>
+    <div class="figure-bleed">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="stage"><svg id="fig-vs-left"></svg></div>
+        <div class="stage"><svg id="fig-vs-right"></svg></div>
+      </div>
+      <p class="figure-caption">
+        Both algorithms run continuously on the same landscape. NNA (blue)
+        moves as a coordinated swarm — a weight matrix smoothly mixing the
+        whole population each step. The GA (pink) crosses over pairs of
+        parents with mutation noise, producing jumpier, less coherent
+        motion. Both find the optimum; they take different paths there.
+      </p>
+    </div>
+
+    <div class="prose">
+      <div class="references">
+        <h2>References</h2>
+        <ol>
+          <li>
+            Sadollah, A., Sayyaadi, H., & Yadav, A. (2018).
+            <em>A dynamic metaheuristic optimization model inspired by
+            biological nervous systems: Neural network algorithm.</em>
+            Applied Soft Computing, 71, 747–782.
+            <a href="https://www.sciencedirect.com/science/article/abs/pii/S1568494618304277">sciencedirect.com</a>
+          </li>
+          <li>
+            Sadollah, A. <em>Neural Network Algorithm (NNA) — author page.</em>
+            <a href="https://ali-sadollah.com/neural-network-algorithm-nna/">ali-sadollah.com</a>
+          </li>
+          <li>
+            Ciechanowski, B. <em>Mechanical Watch</em> — the scrollytelling
+            aesthetic this page borrows from.
+            <a href="https://ciechanow.ski/mechanical-watch/">ciechanow.ski/mechanical-watch</a>
+          </li>
+          <li>
+            Goh, G. <em>Why Momentum Really Works.</em> Distill, 2017.
+            <a href="https://distill.pub/2017/momentum/">distill.pub/2017/momentum</a>
+          </li>
+          <li>
+            Powell, V. <em>Markov Chains explained visually.</em> Setosa.
+            <a href="https://setosa.io/ev/markov-chains/">setosa.io/ev/markov-chains</a>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

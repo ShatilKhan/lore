@@ -1,0 +1,18 @@
+{
+  "name": "lore",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Animated AI/ML explainers — Ciechanowski-style scrollytelling with anime.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "animejs": "^4.0.0"
+  }
+}

@@ -1,0 +1,310 @@
+:root {
+  /* dark theme — default */
+  --bg: #0a0c12;
+  --bg-elev: #11141d;
+  --bg-fig: #0d1018;
+  --ink: #e8eaf0;
+  --ink-dim: #9aa0b0;
+  --ink-faint: #5a6072;
+  --accent: #7cc4ff;
+  --accent-warm: #ffb74d;
+  --accent-hot: #ff5e7e;
+  --accent-cool: #8affd0;
+  --rule: #1f2433;
+  --rule-strong: #2a3147;
+  --edge: #3a4257;
+  --edge-muted: #2a3147;
+  --fg-on-accent: #ffffff;
+  --fg-on-fig: #e8eaf0;
+  --basin-a: #1a3a5a;
+  --basin-b: #3a1a4a;
+  --serif: ui-serif, "Iowan Old Style", "Charter", "Source Serif Pro", Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Inter", "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, monospace;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f7f8fb;
+  --bg-elev: #ffffff;
+  --bg-fig: #eef1f6;
+  --ink: #15181f;
+  --ink-dim: #4b5263;
+  --ink-faint: #8a91a3;
+  --accent: #2563eb;
+  --accent-warm: #c2410c;
+  --accent-hot: #be123c;
+  --accent-cool: #047857;
+  --rule: #e2e6ee;
+  --rule-strong: #c8cfdc;
+  /* Edges/connectors need to read against the light figure bg; use a real
+     mid-gray here, not the rule color which is only meant for dividers. */
+  --edge: #475569;
+  --edge-muted: #94a3b8;
+  --fg-on-accent: #ffffff;
+  --fg-on-fig: #15181f;
+  --basin-a: #cfe1f4;
+  --basin-b: #e9d6f0;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); overflow-x: hidden; }
+body {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ===================== LANDING ===================== */
+.landing main { max-width: 720px; margin: 0 auto; padding: 6rem 1.5rem 8rem; }
+.landing .hero { margin-bottom: 5rem; }
+.eyebrow {
+  font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--accent); margin: 0 0 1rem;
+}
+.landing h1 {
+  font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.1; margin: 0 0 1.5rem; letter-spacing: -0.02em;
+}
+.lede { font-size: 1.15rem; color: var(--ink-dim); max-width: 38ch; }
+
+.topic-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 6rem; }
+.topic-card {
+  display: block; padding: 1.75rem 1.75rem 1.5rem; background: var(--bg-elev);
+  border: 1px solid var(--rule); border-radius: 12px; color: var(--ink);
+  transition: transform 240ms ease, border-color 240ms ease;
+}
+.topic-card:hover.available { transform: translateY(-2px); border-color: var(--accent); text-decoration: none; }
+.topic-card .num { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); letter-spacing: 0.15em; }
+.topic-card h2 { font-family: var(--serif); font-size: 1.5rem; margin: 0.5rem 0 0.75rem; letter-spacing: -0.01em; }
+.topic-card p { color: var(--ink-dim); margin: 0 0 1rem; font-size: 1rem; }
+.topic-card .cta { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); }
+.topic-card.soon { opacity: 0.55; }
+.topic-card.soon .cta { color: var(--ink-faint); }
+
+footer { border-top: 1px solid var(--rule); padding-top: 2rem; color: var(--ink-faint); font-size: 0.9rem; max-width: 720px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem; }
+
+/* ===================== ARTICLE LAYOUT ===================== */
+/* Prose container is now wide (matches figure-bleed) so the left/right
+   gutters line up. Individual paragraphs stay narrow (~70ch) so line length
+   remains readable — the wide container gives the *layout* parity with the
+   figures, the inner width gives the *text* its readable line length. */
+.article { --col: 1180px; --measure: 68ch; }
+.article header.title,
+.article .prose,
+.article .references,
+.article .figure-caption {
+  max-width: var(--col);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+/* Prose paragraphs and lists fill the wide container — line length is long
+   but matches the figure width, as requested. References + figure-caption
+   stay at a readable measure since they're secondary text. */
+.article .prose p,
+.article .prose ul,
+.article .prose ol {
+  max-width: none;
+}
+.article .references ol,
+.article .figure-caption {
+  max-width: var(--measure);
+}
+.article header.title { padding-top: 6rem; padding-bottom: 3rem; }
+.article .back {
+  display: inline-block; font-family: var(--mono); font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.75rem;
+  color: var(--ink-dim);
+}
+.article h1 {
+  font-family: var(--serif); font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.08; letter-spacing: -0.02em; margin: 0.5rem 0 1rem;
+}
+.article .subtitle { color: var(--ink-dim); font-size: 1.15rem; max-width: 50ch; }
+.article .byline {
+  font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1.5rem;
+}
+
+.article .prose p { margin: 0 0 1.25rem; }
+.article .prose h2 {
+  font-family: var(--serif); font-size: 1.7rem; letter-spacing: -0.01em;
+  margin: 4rem 0 1rem;
+}
+.article .prose em { color: var(--ink); font-style: italic; }
+.article .prose strong { color: var(--ink); }
+.article .prose code, .math {
+  font-family: var(--mono); font-size: 0.92em; background: var(--bg-elev);
+  padding: 0.1em 0.35em; border-radius: 4px; color: var(--accent-warm);
+}
+.article .prose .inline-formula {
+  display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;
+  margin: 1.5rem 0 2rem; padding: 1rem 1.25rem;
+  background: var(--bg-elev); border: 1px solid var(--rule); border-radius: 8px;
+  max-width: var(--measure);
+}
+.article .prose .inline-formula .math {
+  font-size: 1.05em; background: transparent; padding: 0;
+}
+
+/* ===================== FIGURE (full-bleed) ===================== */
+.figure {
+  margin: 4rem 0;
+  padding: 0;
+  width: 100%;
+}
+.figure-bleed { /* wider than column, narrower than viewport */
+  max-width: 1180px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}
+.figure-eyebrow {
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--accent);
+  max-width: var(--col); margin: 0 auto 0.5rem; padding: 0 1.5rem;
+}
+.figure-title {
+  font-family: var(--serif); font-size: 1.6rem; letter-spacing: -0.01em;
+  max-width: var(--col); margin: 0 auto 1.25rem; padding: 0 1.5rem;
+}
+.figure-caption {
+  color: var(--ink-dim); font-size: 0.98rem; margin-top: 1.25rem;
+}
+
+.stage {
+  position: relative;
+  background: var(--bg-fig);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.stage svg { display: block; width: 100%; height: 100%; }
+.stage.tall   { aspect-ratio: 16 / 11; }
+.stage.wide   { aspect-ratio: 21 / 9; }
+.stage.square { aspect-ratio: 1 / 1; }
+
+/* ===================== STICKY MARQUEE (scrub-bound) ===================== */
+.scrub-figure { position: relative; margin: 6rem 0 4rem; }
+/* The pin holds the stage + controls together so they stay glued for the
+   entire scrub. Stage shrinks slightly to leave room for the controls below. */
+.scrub-figure .scrub-pin {
+  position: sticky; top: 6vh;
+  max-width: 1180px; margin: 0 auto;
+}
+.scrub-figure .scrub-stage {
+  height: 76vh;
+  background: var(--bg-fig); border: 1px solid var(--rule);
+  border-radius: 14px 14px 0 0; border-bottom: none;
+  overflow: hidden;
+}
+.scrub-figure .scrub-controls {
+  background: var(--bg-elev);
+  border: 1px solid var(--rule); border-top: none;
+  border-radius: 0 0 14px 14px;
+}
+.scrub-figure .scrub-controls .controls {
+  margin: 0; border-radius: 0; border: none; background: transparent;
+}
+/* Track gives the scrub its scroll-length. margin-top pulls it behind the pin
+   so the pin's height alone determines how long sticky is held. */
+.scrub-figure .scrub-track {
+  height: 95vh; pointer-events: none;
+  margin-top: -84vh;
+}
+.scrub-figure .scrub-caption {
+  max-width: 1180px; margin: 1rem auto 0; padding: 0 1.5rem;
+}
+.scrub-figure .scrub-labels {
+  position: absolute; top: 0; left: 0; width: 100%; pointer-events: none;
+}
+.scrub-figure .scrub-label {
+  position: absolute; padding: 0.85rem 1rem; max-width: 280px;
+  background: rgba(10,12,18,0.78); backdrop-filter: blur(8px);
+  border: 1px solid var(--rule); border-radius: 8px;
+  font-family: var(--sans); font-size: 0.92rem; color: var(--ink-dim);
+}
+.scrub-figure .scrub-label strong { color: var(--accent); font-family: var(--serif); font-size: 1.02rem; }
+
+/* ===================== CONTROLS ===================== */
+.controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem;
+  padding: 1rem 1.25rem; margin-top: 0.75rem;
+  background: var(--bg-elev); border: 1px solid var(--rule); border-radius: 10px;
+  font-family: var(--sans);
+}
+.controls .ctrl { display: flex; align-items: center; gap: 0.6rem; }
+.controls .ctrl label {
+  font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-dim); font-family: var(--mono);
+}
+.controls input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 140px; height: 4px; background: var(--rule-strong); border-radius: 2px;
+  outline: none;
+}
+.controls input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg);
+  cursor: grab;
+}
+.controls input[type=range]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg); cursor: grab;
+}
+.controls .value {
+  font-family: var(--mono); font-size: 0.85rem; color: var(--accent-warm);
+  min-width: 2.5ch; text-align: right;
+}
+.controls button {
+  font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent);
+  background: transparent; border: 1px solid var(--accent);
+  padding: 0.45rem 0.9rem; border-radius: 6px; cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+.controls button:hover { background: var(--accent); color: var(--bg); }
+.controls .spacer { flex: 1; }
+
+/* ===================== FLOATING TOGGLES ===================== */
+.pause-toggle, .theme-toggle {
+  position: fixed; z-index: 50;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--bg-elev); border: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-dim); cursor: pointer; font-family: var(--mono);
+  transition: color 160ms ease, border-color 160ms ease, background 240ms ease;
+}
+.pause-toggle { bottom: 1.25rem; left: 1.25rem; }
+.theme-toggle { bottom: 1.25rem; left: 4.5rem; }
+.pause-toggle:hover, .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.pause-toggle svg { width: 14px; height: 14px; fill: currentColor; }
+.theme-toggle svg { width: 16px; height: 16px; }
+
+/* ===================== REFERENCES ===================== */
+.references {
+  border-top: 1px solid var(--rule); margin-top: 5rem; padding-top: 2.5rem;
+  padding-bottom: 4rem;
+}
+.references h2 { font-size: 1.3rem; margin-top: 0; }
+.references ol { padding-left: 1.25rem; color: var(--ink-dim); font-size: 0.95rem; }
+.references li { margin-bottom: 0.6rem; }
+.references li a { word-break: break-word; }
+
+/* ===================== MOBILE ===================== */
+@media (max-width: 760px) {
+  .stage.wide { aspect-ratio: 4 / 3; }
+  .scrub-figure .scrub-pin { top: 8vh; }
+  .scrub-figure .scrub-stage { height: 62vh; }
+  .scrub-figure .scrub-track { height: 90vh; margin-top: -76vh; }
+  .controls { gap: 1rem; padding: 0.85rem 0.9rem; }
+  .controls input[type=range] { width: 110px; }
+}
